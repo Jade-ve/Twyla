@@ -1,0 +1,33 @@
+name: Registry Storage Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  store-in-registry:
+    runs-on: windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run the registry script with a sample value
+        run: echo "Hello from GitHub Actions" | python registry_store.py
+
+      - name: Show the created registry key (proof for the assignment)
+        run: reg query "HKCU\Software\RegistryStoreDemo"
+
+      - name: Export the key to a .reg file
+        run: |
+          reg export "HKCU\Software\RegistryStoreDemo" registry_proof.reg /y
+          type registry_proof.reg
+
+      - name: Upload the .reg file as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-proof
+          path: registry_proof.reg
